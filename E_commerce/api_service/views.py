@@ -29,9 +29,23 @@ def  ProductDetailAPIView(request,company,productname):
     top = request.GET.get('top', 10)
     minPrice = request.GET.get('minPrice', 1)
     maxPrice = request.GET.get('maxPrice', 10000)
-    url = f'http://20.244.56.144/products/companies/{company}/catogories/{productname}/products'
+    url1 = 'http://20.244.56.144/products/auth'
+    data = {
+    "companyName": "goMart",
+    "clientID": "b0df61d8-19d9-4d08-88ef-09840211483b",
+    "clientSecret": "IQkevapeZJpOaEqS",
+    "ownerName": "VISHVA",
+    "ownerEmail": "vishva28sep@gmail.com",
+    "rollNo": "721221106122"
+    }
+    response = requests.post(url1,json=data)
+    print(response.json())
+    url = f'http://20.244.56.144/products/companies/{company}/categories/{productname}/products'
+    response_data = response.json()
+    Token_type = response_data.get('toekn_type')
+    token = response_data.get('access_token')
     headers = {
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzEwOTEzNjI3LCJpYXQiOjE3MTA5MTMzMjcsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6ImIwZGY2MWQ4LTE5ZDktNGQwOC04OGVmLTA5ODQwMjExNDgzYiIsInN1YiI6InZpc2h2YTI4c2VwQGdtYWlsLmNvbSJ9LCJjb21wYW55TmFtZSI6ImdvTWFydCIsImNsaWVudElEIjoiYjBkZjYxZDgtMTlkOS00ZDA4LTg4ZWYtMDk4NDAyMTE0ODNiIiwiY2xpZW50U2VjcmV0IjoiSVFrZXZhcGVaSnBPYUVxUyIsIm93bmVyTmFtZSI6IlZJU0hWQSIsIm93bmVyRW1haWwiOiJ2aXNodmEyOHNlcEBnbWFpbC5jb20iLCJyb2xsTm8iOiI3MjEyMjExMDYxMjIifQ.saFbc78TDF7VB9x8d5yBq9ra7ldx5lIZw5g_D420hiM',
+    'Authorization': f'{Token_type} {token}',
     'Content-Type': 'application/json'
     }
     params = {
@@ -42,7 +56,7 @@ def  ProductDetailAPIView(request,company,productname):
     response = requests.get(url,headers=headers,params=params)
     print(response)
     if request.method=='GET':
-        if response.status_code!=200:
-            return Response(response)
+        if response.status_code==200:
+            return Response(response.json())
         else:
             return Response({"error":"Not Found"})
